@@ -50,18 +50,17 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "cmsis_os.h"
-
-/* USER CODE BEGIN Includes */
+#include "main.h"
 #include "keyboard.h"
 #include "led.h"
-#include "responder.h"
+
+/* USER CODE BEGIN Includes */
+
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
 osThreadId keyboardTaskHandle;
 osThreadId ledTaskHandle;
-osMessageQId keypressedQueueHandle;
-osTimerId keyHoldedTimerHandle;
 
 /* USER CODE BEGIN Variables */
 
@@ -70,7 +69,6 @@ osTimerId keyHoldedTimerHandle;
 /* Function prototypes -------------------------------------------------------*/
 void StartKeyboardTask(void const * argument);
 void StartLedTask(void const * argument);
-void KeyHoldedTimerCallback(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -95,11 +93,6 @@ void MX_FREERTOS_Init(void) {
 	/* add semaphores, ... */
 	/* USER CODE END RTOS_SEMAPHORES */
 
-	/* Create the timer(s) */
-	/* definition and creation of keyHoldedTimer */
-	osTimerDef(keyHoldedTimer, KeyHoldedTimerCallback);
-	keyHoldedTimerHandle = osTimerCreate(osTimer(keyHoldedTimer), osTimerPeriodic, NULL);
-
 	/* USER CODE BEGIN RTOS_TIMERS */
 
 	/* start timers, add new ones, ... */
@@ -118,11 +111,6 @@ void MX_FREERTOS_Init(void) {
 	/* add threads, ... */
 	/* USER CODE END RTOS_THREADS */
 
-	/* Create the queue(s) */
-	/* definition and creation of keypressedQueue */
-	osMessageQDef(keypressedQueue, 16, uint32_t);
-	keypressedQueueHandle = osMessageCreate(osMessageQ(keypressedQueue), NULL);
-
 	/* USER CODE BEGIN RTOS_QUEUES */
 	/* add queues, ... */
 	/* USER CODE END RTOS_QUEUES */
@@ -132,10 +120,9 @@ void MX_FREERTOS_Init(void) {
 void StartKeyboardTask(void const * argument) {
 
 	/* USER CODE BEGIN StartKeyboardTask */
-	char kb_string[KEYBOARD_MAX_MULTITOUCH];
+	char kb_string[KEYBOARD_MAX_MULTITOUCH] = "";
 	char prev_string[KEYBOARD_MAX_MULTITOUCH];
-	static KEYS_PRESSED keys = { 0, 0, 0, 0 };
-	uint32_t tick;
+
 	/* Infinite loop */
 	for (;;) {
 
@@ -143,49 +130,28 @@ void StartKeyboardTask(void const * argument) {
 		KeyboardPoll(kb_string);
 
 		//if we have non-empty string during debounce time
-		if (0 != strcmp("", kb_string)) {
+		if ((0 != strcmp("", kb_string)) && (0 == strcmp(kb_string, prev_string))) {
 			//we`ve detected pressing!
-			tick = HAL_GetTick();
-			do {
-				//now wait for release
-				osDelay(KEYBOARD_BOUNCE_TIME / 2);
+			while (0 == strcmp(kb_string, prev_string)) {
 				strcpy(prev_string, kb_string);
 				KeyboardPoll(kb_string);
-			} while (0 == strcmp(kb_string, prev_string));
-			//YEAH YEAH. IF WE WILL HOLD A BUTTON EXACTLY maxuint32_t/1000 seconds we`ll make a mistake...
-			//This device is not supposed to be working more than a hour
-			tick = HAL_GetTick() - tick;
-			if (tick > KEYBOARD_BOUNCE_TIME) {
-				keys.key_1 = (char) prev_string[0];
-				keys.key_2 = (char) prev_string[1];
-				if (tick > KEYBOARD_LONG_PRESSED_CRITERION) {
-					keys.presstype = LONG_PRESSED;
-				} else {
-					keys.presstype = SHORT_PRESSED;
-				}
+				osDelay(KEYBOARD_BOUNCE_TIME);
 			}
-
-			LedOn();
-			if (keys.presstype == SHORT_PRESSED) {
-
-				if (0 == keys.key_2) {
-					single_key_pressed(keys.key_1);
-				} else {
-					double_key_pressed(keys.key_1, keys.key_2);
-				}
-			}
-
-			else {
-				if (0 == keys.key_2) {
-					single_key_long_pressed(keys.key_1);
-				} else {
-					double_key_long_pressed(keys.key_1, keys.key_2);
-				}
-			}
+			printf(strcat(prev_string, "\n"));
+			//now wait for release
+		};
+		//now analyse what we have;y
+		uint8_t num_keys_pressed;
+		num_keys_pressed = strlen(kb_string);
+		switch (num_keys_pressed) {
+		case 1:
+			break;
+		case 2:
+			break;
+		default:
+			break;
 		}
-//now analyse what we have;y
-
-//printf(strcat(kb_string, "\n"));
+		//printf(strcat(kb_string, "\n"));
 		osDelay(KEYBOARD_BOUNCE_TIME);
 
 	}
@@ -198,18 +164,11 @@ void StartLedTask(void const * argument) {
 	/* Infinite loop */
 	for (;;) {
 		LedOn();
-		osDelay(10);
+		osDelay(100);
 		LedOff();
 		osDelay(100);
 	}
 	/* USER CODE END StartLedTask */
-}
-
-/* KeyHoldedTimerCallback function */
-void KeyHoldedTimerCallback(void const * argument) {
-	/* USER CODE BEGIN KeyHoldedTimerCallback */
-
-	/* USER CODE END KeyHoldedTimerCallback */
 }
 
 /* USER CODE BEGIN Application */
