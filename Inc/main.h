@@ -59,23 +59,6 @@
 
 /* Private define ------------------------------------------------------------*/
 
-/*  led. just in case... */
-#define LED_Pin GPIO_PIN_13
-#define LED_GPIO_Port GPIOC
-
-
-/*  matrix keyboard ROW pins & port*/
-#define ROW_GPIO_Port GPIOB
-#define ROW_1_Pin GPIO_PIN_12
-#define ROW_2_Pin GPIO_PIN_13
-#define ROW_3_Pin GPIO_PIN_14
-#define ROW_4_Pin GPIO_PIN_15
-
-/*  matrix keyboard column pins & port*/
-#define CLM_GPIO_Port GPIOA
-#define CLM_1_Pin GPIO_PIN_8
-#define CLM_2_Pin GPIO_PIN_9
-#define CLM_3_Pin GPIO_PIN_10
 
 
 /* ########################## Assert Selection ############################## */
@@ -86,6 +69,20 @@
  #define USE_FULL_ASSERT    1U 
 
 /* USER CODE BEGIN Private defines */
+
+#define LED_Pin GPIO_PIN_13
+#define LED_GPIO_Port GPIOC
+
+#define ROW_GPIO_Port GPIOB
+#define ROW_1_Pin GPIO_PIN_12
+#define ROW_2_Pin GPIO_PIN_13
+#define ROW_3_Pin GPIO_PIN_14
+#define ROW_4_Pin GPIO_PIN_15
+
+#define CLM_GPIO_Port GPIOA
+#define CLM_1_Pin GPIO_PIN_8
+#define CLM_2_Pin GPIO_PIN_9
+#define CLM_3_Pin GPIO_PIN_10
 
 /* USER CODE END Private defines */
 
