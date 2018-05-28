@@ -8,10 +8,6 @@
 #include "responder.h"
 static char outstring[OUTPUT_LENGTH];
 
-void single_key_pressed(char key);
-void double_key_pressed(char key, char key2);
-void single_key_long_pressed(char key);
-void double_key_long_pressed(char key, char key2);
 
 void single_key_pressed(char key) {
 	memset(outstring, 0, OUTPUT_LENGTH);

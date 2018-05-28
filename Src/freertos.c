@@ -60,17 +60,23 @@
 /* Variables -----------------------------------------------------------------*/
 osThreadId keyboardTaskHandle;
 osThreadId ledTaskHandle;
-osMessageQId keypressedQueueHandle;
-osTimerId keyHoldedTimerHandle;
+
 
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
 
 /* Function prototypes -------------------------------------------------------*/
+
+/*
+ * Polls a keypad and ouptuts keys pressed
+ * */
 void StartKeyboardTask(void const * argument);
+
+/*
+ * Indicates that we are on (diode blink)
+ * */
 void StartLedTask(void const * argument);
-void KeyHoldedTimerCallback(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -97,8 +103,6 @@ void MX_FREERTOS_Init(void) {
 
 	/* Create the timer(s) */
 	/* definition and creation of keyHoldedTimer */
-	osTimerDef(keyHoldedTimer, KeyHoldedTimerCallback);
-	keyHoldedTimerHandle = osTimerCreate(osTimer(keyHoldedTimer), osTimerPeriodic, NULL);
 
 	/* USER CODE BEGIN RTOS_TIMERS */
 
@@ -119,9 +123,6 @@ void MX_FREERTOS_Init(void) {
 	/* USER CODE END RTOS_THREADS */
 
 	/* Create the queue(s) */
-	/* definition and creation of keypressedQueue */
-	osMessageQDef(keypressedQueue, 16, uint32_t);
-	keypressedQueueHandle = osMessageCreate(osMessageQ(keypressedQueue), NULL);
 
 	/* USER CODE BEGIN RTOS_QUEUES */
 	/* add queues, ... */
@@ -198,19 +199,15 @@ void StartLedTask(void const * argument) {
 	/* Infinite loop */
 	for (;;) {
 		LedOn();
-		osDelay(10);
-		LedOff();
 		osDelay(100);
+		LedOff();
+		osDelay(900);
 	}
 	/* USER CODE END StartLedTask */
 }
 
 /* KeyHoldedTimerCallback function */
-void KeyHoldedTimerCallback(void const * argument) {
-	/* USER CODE BEGIN KeyHoldedTimerCallback */
 
-	/* USER CODE END KeyHoldedTimerCallback */
-}
 
 /* USER CODE BEGIN Application */
 

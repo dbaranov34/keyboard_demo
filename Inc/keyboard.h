@@ -12,16 +12,13 @@
 #include <string.h>
 #include "gpio.h"
 #include "stm32f1xx_hal.h"
-/*
- * Keyboard GPIO initializer.
- * Writes 1 to COL_* pins
- */
 
-#define KEYBOARD_ROWS 4
-#define KEYBOARD_COLUMNS 3
-#define KEYBOARD_MAX_MULTITOUCH 3
-#define KEYBOARD_BOUNCE_TIME 30 //measuren in os_ticks (1ms by defaults)
-#define KEYBOARD_LONG_PRESSED_CRITERION 1000 // measured in miliseconds. Do not forget  to call once SystemCoreClockUpdate() somewhere before
+
+#define KEYBOARD_ROWS 4 					//y-dimension of the ketboard
+#define KEYBOARD_COLUMNS 3 					//x-dimension of the ketboard
+#define KEYBOARD_MAX_MULTITOUCH 2			//maxNum of keys could be legally pressed
+#define KEYBOARD_BOUNCE_TIME 30				// measured in os_ticks (1ms by defaults)
+#define KEYBOARD_LONG_PRESSED_CRITERION 1000// measured in miliseconds. Do not forget  to call once SystemCoreClockUpdate() somewhere before
 
 #define LONG_PRESSED 1
 #define SHORT_PRESSED 0
@@ -33,7 +30,13 @@ typedef struct keys_pressed{
 	uint8_t align_1;
 } KEYS_PRESSED;
 
-
+/*
+ * Keyboard poller.
+ * Returns a ptr to string with keys pressed.
+ * String must be long enough.
+ * Unsafe funciton!
+ *
+ */
 void KeyboardPoll(char* kb_string);
 
 #endif /* KEYBOARD_H_ */
